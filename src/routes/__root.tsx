@@ -3,6 +3,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 function BaseLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +23,7 @@ const RootLayout = () => (
       <Outlet />
     </BaseLayout>
     <TanStackRouterDevtools />
+    <Toaster position="top-right" />
   </>
 );
 

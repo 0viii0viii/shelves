@@ -19,7 +19,7 @@ interface Memo {
 }
 
 function RouteComponent() {
-  const [memos, setMemos] = useState<Memo[]>([
+  const [memos] = useState<Memo[]>([
     {
       id: 1,
       title: "아이디어 노트",
@@ -57,29 +57,12 @@ function RouteComponent() {
     },
   ]);
 
-  const [selectedMemo, setSelectedMemo] = useState<Memo | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const handleMemoClick = (memo: Memo) => {
-    setSelectedMemo(memo);
-    setIsModalOpen(true);
+    console.log("메모 클릭:", memo);
   };
 
   const handleAddMemo = () => {
-    setSelectedMemo(null);
-    setIsModalOpen(true);
-  };
-
-  const handleSaveMemo = (memo: Memo) => {
-    if (selectedMemo) {
-      setMemos(memos.map((m) => (m.id === memo.id ? memo : m)));
-    } else {
-      setMemos([memo, ...memos]);
-    }
-  };
-
-  const handleDeleteMemo = (id: number) => {
-    setMemos(memos.filter((m) => m.id !== id));
+    console.log("새 메모 추가");
   };
 
   const truncateContent = (content: string, maxLength: number = 100) => {
