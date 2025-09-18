@@ -28,7 +28,7 @@ export const getIncompleteTodos = (todos: Todo[]): Todo[] => {
 };
 
 export const getCompletedTodos = (todos: Todo[]): Todo[] => {
-  return todos.filter((todo) => todo.completed);
+  return todos.filter((todo) => !!todo.completed);
 };
 
 export const hasCompletedTodos = (todos: Todo[]): boolean => {

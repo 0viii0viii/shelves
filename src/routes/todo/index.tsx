@@ -1,3 +1,18 @@
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -26,6 +41,13 @@ function RouteComponent() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const addTodo = async (content: string) => {
     try {
@@ -56,7 +78,9 @@ function RouteComponent() {
 
       setTodos((prevTodos) =>
         prevTodos.map((todo) =>
-          todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+          todo.id === id
+            ? { ...todo, completed: todo.completed === 0 ? 1 : 0 }
+            : todo,
         ),
       );
     } catch (error) {
@@ -107,6 +131,38 @@ function RouteComponent() {
     }
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const incompleteTodos = getIncompleteTodos(todos);
+      const oldIndex = incompleteTodos.findIndex(
+        (todo) => todo.id === active.id,
+      );
+      const newIndex = incompleteTodos.findIndex((todo) => todo.id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const reorderedTodos = arrayMove(incompleteTodos, oldIndex, newIndex);
+
+        // 완료된 todos와 합쳐서 전체 todos 배열 업데이트
+        const completedTodos = getCompletedTodos(todos);
+        const newTodos = [...reorderedTodos, ...completedTodos];
+
+        setTodos(newTodos);
+
+        try {
+          await TodoService.updateTodoOrder(reorderedTodos);
+        } catch (error) {
+          console.error("할 일 순서 업데이트에 실패했습니다:", error);
+          showErrorToast("할 일 순서 업데이트에 실패했습니다.");
+          // 실패 시 원래 상태로 복원
+          const originalTodos = await TodoService.getAllTodos();
+          setTodos(originalTodos);
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchTodos = async () => {
       try {
@@ -136,31 +192,42 @@ function RouteComponent() {
             <LoadingState />
           ) : (
             <>
-              {/* 미완료된 할 일들 */}
-              {getIncompleteTodos(todos).map((todo) => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  isEditing={editingId === todo.id}
-                  editValue={editValue}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={getIncompleteTodos(todos).map((todo) => todo.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {/* 미완료된 할 일들 */}
+                  {getIncompleteTodos(todos).map((todo) => (
+                    <TodoItem
+                      key={todo.id}
+                      todo={todo}
+                      isEditing={editingId === todo.id}
+                      editValue={editValue}
+                      onToggle={checkTodo}
+                      onDelete={deleteTodo}
+                      onStartEdit={startEdit}
+                      onSaveEdit={saveEdit}
+                      onCancelEdit={cancelEdit}
+                      onEditValueChange={setEditValue}
+                    />
+                  ))}
+                </SortableContext>
+
+                {/* 완료된 할 일들 */}
+                <CompletedTodosList
+                  todos={getCompletedTodos(todos)}
                   onToggle={checkTodo}
                   onDelete={deleteTodo}
-                  onStartEdit={startEdit}
-                  onSaveEdit={saveEdit}
-                  onCancelEdit={cancelEdit}
-                  onEditValueChange={setEditValue}
                 />
-              ))}
 
-              {/* 완료된 할 일들 */}
-              <CompletedTodosList
-                todos={getCompletedTodos(todos)}
-                onToggle={checkTodo}
-                onDelete={deleteTodo}
-              />
-
-              {/* 빈 상태 */}
-              {todos.length === 0 && <EmptyState />}
+                {/* 빈 상태 */}
+                {todos.length === 0 && <EmptyState />}
+              </DndContext>
             </>
           )}
         </div>

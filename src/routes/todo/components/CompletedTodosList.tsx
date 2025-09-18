@@ -45,7 +45,7 @@ export const CompletedTodosList = ({
               <div className="flex items-center space-x-3">
                 <Checkbox
                   className="cursor-pointer"
-                  checked={todo.completed}
+                  checked={!!todo.completed}
                   onCheckedChange={() => onToggle(todo.id)}
                 />
                 <span className="text-muted-foreground line-through">

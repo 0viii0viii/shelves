@@ -1,4 +1,6 @@
-import { Edit2, Save, Trash2, X } from "lucide-react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Edit2, GripVertical, Save, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,6 +33,20 @@ export const TodoItem = ({
   onEditValueChange,
   className = "",
 }: TodoItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: todo.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       onSaveEdit(todo.id);
@@ -40,12 +56,25 @@ export const TodoItem = ({
   };
 
   return (
-    <Card className={className}>
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={`${className} ${isDragging ? "opacity-50" : ""}`}
+    >
       <CardContent className="p-2">
         <div className="flex items-center space-x-3">
+          {/* 드래그 핸들 */}
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
+          >
+            <GripVertical className="h-4 w-4 text-gray-400" />
+          </div>
+
           <Checkbox
             className="cursor-pointer"
-            checked={todo.completed}
+            checked={!!todo.completed}
             onCheckedChange={() => onToggle(todo.id)}
           />
           {isEditing ? (
