@@ -5,6 +5,7 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 
 import { ClerkWrapper, useClerkAuth } from "./auth/clerk";
+import { LoadingScreen } from "./components/LoadingSpinner";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 
@@ -21,11 +22,7 @@ declare module "@tanstack/react-router" {
 function App() {
   const auth = useClerkAuth();
   if (auth.isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        Loading...
-      </div>
-    );
+    return <LoadingScreen />;
   }
   return <RouterProvider router={router} context={{ auth }} />;
 }
