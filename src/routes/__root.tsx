@@ -1,6 +1,11 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  Outlet,
+  useLocation,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
+import { useClerkAuth } from "@/auth/clerk";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
@@ -8,7 +13,6 @@ import { Toaster } from "@/components/ui/sonner";
 function BaseLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen flex-col">
-      {/* <DragWindowRegion /> */}
       <SidebarProvider>
         <AppSidebar />
         <main className="bg-background h-full w-full">{children}</main>
@@ -17,14 +21,34 @@ function BaseLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-const RootLayout = () => (
-  <>
-    <BaseLayout>
-      <Outlet />
-    </BaseLayout>
-    <TanStackRouterDevtools />
-    <Toaster position="top-right" />
-  </>
-);
+const RootLayout = () => {
+  const location = useLocation();
 
-export const Route = createRootRoute({ component: RootLayout });
+  if (location.pathname === "/sign-in" || location.pathname === "/sign-up") {
+    return (
+      <>
+        <Outlet />
+        <TanStackRouterDevtools />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <BaseLayout>
+        <Outlet />
+      </BaseLayout>
+      <TanStackRouterDevtools />
+      <Toaster position="top-right" />
+    </>
+  );
+};
+
+type RouterContext = {
+  auth: ReturnType<typeof useClerkAuth>;
+};
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+  component: RootLayout,
+});

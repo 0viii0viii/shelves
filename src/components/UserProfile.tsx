@@ -1,3 +1,4 @@
+import { useClerk, useUser } from "@clerk/clerk-react";
 import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,18 +31,32 @@ export function UserProfile({
       .slice(0, 2);
   };
 
+  const { user } = useUser();
+  const { signOut } = useClerk();
+
+  const handleLogout = () => {
+    signOut({ redirectUrl: "/sign-in" });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="hover:bg-accent flex w-full cursor-pointer items-center gap-3 transition-colors">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={avatarSrc} alt={userName} />
-            <AvatarFallback>{getInitials(userName)}</AvatarFallback>
+            <AvatarImage
+              src={user?.imageUrl || avatarSrc}
+              alt={user?.fullName || userName}
+            />
+            <AvatarFallback>
+              {getInitials(user?.fullName || userName)}
+            </AvatarFallback>
           </Avatar>
           <div className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate text-sm font-medium">{userName}</span>
+            <span className="truncate text-sm font-medium">
+              {user?.fullName || userName}
+            </span>
             <span className="text-muted-foreground truncate text-xs">
-              {userEmail}
+              {user?.primaryEmailAddress?.emailAddress || userEmail}
             </span>
           </div>
           <ChevronDown className="text-muted-foreground h-4 w-4" />
@@ -59,7 +74,7 @@ export function UserProfile({
           <span>설정</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-red-600">
+        <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>로그아웃</span>
         </DropdownMenuItem>
