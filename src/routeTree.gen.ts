@@ -13,6 +13,7 @@ import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TodoIndexRouteImport } from './routes/todo/index'
+import { Route as NoteIndexRouteImport } from './routes/note/index'
 
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
@@ -34,17 +35,24 @@ const TodoIndexRoute = TodoIndexRouteImport.update({
   path: '/todo/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NoteIndexRoute = NoteIndexRouteImport.update({
+  id: '/note/',
+  path: '/note/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/note': typeof NoteIndexRoute
   '/todo': typeof TodoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/note': typeof NoteIndexRoute
   '/todo': typeof TodoIndexRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/note/': typeof NoteIndexRoute
   '/todo/': typeof TodoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in' | '/sign-up' | '/todo'
+  fullPaths: '/' | '/sign-in' | '/sign-up' | '/note' | '/todo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sign-in' | '/sign-up' | '/todo'
-  id: '__root__' | '/' | '/sign-in' | '/sign-up' | '/todo/'
+  to: '/' | '/sign-in' | '/sign-up' | '/note' | '/todo'
+  id: '__root__' | '/' | '/sign-in' | '/sign-up' | '/note/' | '/todo/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  NoteIndexRoute: typeof NoteIndexRoute
   TodoIndexRoute: typeof TodoIndexRoute
 }
 
@@ -99,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TodoIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/note/': {
+      id: '/note/'
+      path: '/note'
+      fullPath: '/note'
+      preLoaderRoute: typeof NoteIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  NoteIndexRoute: NoteIndexRoute,
   TodoIndexRoute: TodoIndexRoute,
 }
 export const routeTree = rootRouteImport

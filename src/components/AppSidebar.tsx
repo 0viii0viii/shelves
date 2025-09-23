@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Inbox } from "lucide-react";
+import { Home, Inbox, StickyNote } from "lucide-react";
 
 import {
   Sidebar,
@@ -24,6 +24,11 @@ const items = [
     title: "할 일",
     url: "/todo",
     icon: Inbox,
+  },
+  {
+    title: "노트",
+    url: "/note",
+    icon: StickyNote,
   },
 ];
 
