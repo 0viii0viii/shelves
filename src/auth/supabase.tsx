@@ -16,7 +16,6 @@ interface AuthContextType {
     email: string,
     password: string,
   ) => Promise<{ error: AuthError | null }>;
-  signInWithMagicLink: (email: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
 }
@@ -74,16 +73,6 @@ export function SupabaseAuthProvider({
     return { error };
   };
 
-  const signInWithMagicLink = async (email: string) => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    return { error };
-  };
-
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     return { error };
@@ -96,7 +85,6 @@ export function SupabaseAuthProvider({
     isLoading,
     signIn,
     signUp,
-    signInWithMagicLink,
     signOut,
     resetPassword,
   };
