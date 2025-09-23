@@ -4,7 +4,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 
-import { ClerkWrapper, useClerkAuth } from "./auth/clerk";
+import { SupabaseAuthProvider, useSupabaseAuth } from "./auth/supabase";
 import { LoadingScreen } from "./components/LoadingSpinner";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -20,7 +20,7 @@ declare module "@tanstack/react-router" {
 }
 
 function App() {
-  const auth = useClerkAuth();
+  const auth = useSupabaseAuth();
   if (auth.isLoading) {
     return <LoadingScreen />;
   }
@@ -33,9 +33,9 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <ClerkWrapper>
+      <SupabaseAuthProvider>
         <App />
-      </ClerkWrapper>
+      </SupabaseAuthProvider>
     </StrictMode>,
   );
 }

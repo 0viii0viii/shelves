@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Inbox, StickyNote } from "lucide-react";
+import { Home, Inbox } from "lucide-react";
 
 import {
   Sidebar,
@@ -25,11 +25,6 @@ const items = [
     url: "/todo",
     icon: Inbox,
   },
-  {
-    title: "메모",
-    url: "/memo",
-    icon: StickyNote,
-  },
 ];
 
 export function AppSidebar() {
@@ -38,11 +33,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
-            <UserProfile
-              userName="이상헌"
-              userEmail="ffff00yllw@gmail.com"
-              avatarSrc="https://github.com/shadcn.png"
-            />
+            <UserProfile />
           </SidebarGroupLabel>
           <SidebarGroupContent className="mt-2">
             <SidebarMenu>

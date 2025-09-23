@@ -11,10 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
-import { Route as MemoRouteImport } from './routes/memo'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as TodoIndexRouteImport } from './routes/todo/index'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
@@ -26,13 +24,9 @@ const SignInRoute = SignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MemoRoute = MemoRouteImport.update({
-  id: '/memo',
-  path: '/memo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TodoIndexRoute = TodoIndexRouteImport.update({
@@ -40,53 +34,36 @@ const TodoIndexRoute = TodoIndexRouteImport.update({
   path: '/todo/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
-  '/memo': typeof MemoRoute
+  '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
-  '/': typeof AuthenticatedIndexRoute
   '/todo': typeof TodoIndexRoute
 }
 export interface FileRoutesByTo {
-  '/memo': typeof MemoRoute
+  '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
-  '/': typeof AuthenticatedIndexRoute
   '/todo': typeof TodoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/memo': typeof MemoRoute
+  '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/todo/': typeof TodoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/memo' | '/sign-in' | '/sign-up' | '/' | '/todo'
+  fullPaths: '/' | '/sign-in' | '/sign-up' | '/todo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/memo' | '/sign-in' | '/sign-up' | '/' | '/todo'
-  id:
-    | '__root__'
-    | '/_authenticated'
-    | '/memo'
-    | '/sign-in'
-    | '/sign-up'
-    | '/_authenticated/'
-    | '/todo/'
+  to: '/' | '/sign-in' | '/sign-up' | '/todo'
+  id: '__root__' | '/' | '/sign-in' | '/sign-up' | '/todo/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  MemoRoute: typeof MemoRoute
+  IndexRoute: typeof IndexRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   TodoIndexRoute: typeof TodoIndexRoute
@@ -108,18 +85,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/memo': {
-      id: '/memo'
-      path: '/memo'
-      fullPath: '/memo'
-      preLoaderRoute: typeof MemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/todo/': {
@@ -129,31 +99,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TodoIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  MemoRoute: MemoRoute,
+  IndexRoute: IndexRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   TodoIndexRoute: TodoIndexRoute,

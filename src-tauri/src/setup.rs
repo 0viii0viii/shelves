@@ -1,6 +1,5 @@
 use tauri::{App, Manager};
 
-
 pub fn setup_app(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     setup_tray(app)?;
     setup_splashscreen(app)?;

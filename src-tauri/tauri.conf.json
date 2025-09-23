@@ -43,6 +43,11 @@
     ]
   },
   "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["shelves"]
+      }
+    },
     "sql": {
       "preloadDatabases": ["sqlite:shelves.db"]
     }

@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-import { useClerkAuth } from "@/auth/clerk";
+import { useSupabaseAuth } from "@/auth/supabase";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
@@ -46,7 +46,7 @@ const RootLayout = () => {
 };
 
 type RouterContext = {
-  auth: ReturnType<typeof useClerkAuth>;
+  auth: ReturnType<typeof useSupabaseAuth>;
 };
 
 export const Route = createRootRouteWithContext<RouterContext>()({
