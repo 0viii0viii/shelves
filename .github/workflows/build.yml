@@ -73,11 +73,25 @@ jobs:
 
       - name: Build Tauri app (macOS)
         if: matrix.platform == 'macos-latest'
+        env:
+          CARGO_BUILD_JOBS: 4
+          RUSTFLAGS: "-C target-cpu=native"
         run: |
           # macOS 빌드 환경 설정
           export MACOSX_DEPLOYMENT_TARGET=10.15
-          # 코드 서명 없이 빌드 (개발용)
-          pnpm tauri build --config '{"bundle":{"macOS":{"signingIdentity":null,"hardenedRuntime":false}}}'
+          # 코드 서명 및 보안 설정을 완전히 비활성화
+          pnpm tauri build --config '{
+            "bundle": {
+              "macOS": {
+                "signingIdentity": null,
+                "hardenedRuntime": false,
+                "entitlements": null,
+                "exceptionEntitlements": null,
+                "bundleVersion": "1.0.0",
+                "minimumSystemVersion": "10.15"
+              }
+            }
+          }'
 
       - name: Build Tauri app (Windows)
         if: matrix.platform == 'windows-latest'
@@ -85,6 +99,27 @@ jobs:
           CARGO_BUILD_JOBS: 4
           RUSTFLAGS: "-C target-cpu=native"
         run: pnpm tauri build
+
+      - name: Verify macOS app
+        if: matrix.platform == 'macos-latest'
+        run: |
+          # 앱 번들 검증
+          echo "=== 앱 번들 검증 ==="
+          ls -la src-tauri/target/release/bundle/macos/
+
+          # 앱 실행 가능 여부 확인
+          echo "=== 앱 실행 가능 여부 확인 ==="
+          file src-tauri/target/release/bundle/macos/shelves.app/Contents/MacOS/shelves
+
+          # 코드 서명 상태 확인
+          echo "=== 코드 서명 상태 확인 ==="
+          codesign -dv --verbose=4 src-tauri/target/release/bundle/macos/shelves.app || echo "코드 서명 없음 (정상)"
+
+          # DMG 파일 확인
+          echo "=== DMG 파일 확인 ==="
+          ls -la src-tauri/target/release/bundle/dmg/
+
+          echo "=== 빌드 완료 ==="
 
       - name: Upload artifacts (macOS)
         if: matrix.platform == 'macos-latest'
