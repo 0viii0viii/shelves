@@ -75,6 +75,11 @@ export function NoteCard({
     }
   };
 
+  const openMemos = () => onOpen(note);
+  const editNote = () => setIsEditing(true);
+  const deleteNote = () => onDelete(note.id);
+  const lockNote = () => setIsLockDialogOpen(true);
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-2">
@@ -111,7 +116,13 @@ export function NoteCard({
             </div>
           ) : (
             <>
-              <span className="flex-1">{note.title}</span>
+              <span
+                className="flex-1 cursor-pointer"
+                role="button"
+                onClick={openMemos}
+              >
+                {note.title}
+              </span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm">
@@ -119,16 +130,16 @@ export function NoteCard({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onOpen(note)}>
+                  <DropdownMenuItem onClick={openMemos}>
                     <StickyNote className="h-4 w-4 mr-2" />
                     메모
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                  <DropdownMenuItem onClick={editNote}>
                     <Edit2 className="h-4 w-4 mr-2" />
                     편집
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setIsLockDialogOpen(true)}>
+                  <DropdownMenuItem onClick={lockNote}>
                     {note.isLocked ? (
                       <Unlock className="h-4 w-4 mr-2" />
                     ) : (
@@ -138,7 +149,7 @@ export function NoteCard({
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => onDelete(note.id)}
+                    onClick={deleteNote}
                     className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />

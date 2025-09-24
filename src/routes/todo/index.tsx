@@ -36,7 +36,6 @@ export const Route = createFileRoute("/todo/")({
 
 function RouteComponent() {
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
 
@@ -91,7 +90,6 @@ function RouteComponent() {
     try {
       await TodoService.deleteTodo(id);
       setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
-      showSuccessToast(TODO_MESSAGES.DELETE_SUCCESS);
     } catch (error) {
       console.error("할 일 삭제에 실패했습니다:", error);
       showErrorToast(TODO_MESSAGES.DELETE_ERROR);
@@ -122,7 +120,6 @@ function RouteComponent() {
 
       setEditingId(null);
       setEditValue("");
-      showSuccessToast(TODO_MESSAGES.UPDATE_SUCCESS);
     } catch (error) {
       console.error("할 일 수정에 실패했습니다:", error);
       showErrorToast(TODO_MESSAGES.UPDATE_ERROR);
@@ -169,8 +166,6 @@ function RouteComponent() {
       } catch (error) {
         console.error("할 일 목록을 불러오는데 실패했습니다:", error);
         showErrorToast(TODO_MESSAGES.LOAD_ERROR);
-      } finally {
-        setLoading(false);
       }
     };
     fetchTodos();
@@ -180,7 +175,7 @@ function RouteComponent() {
     <div className="h-full overflow-y-auto">
       <div className="flex h-full flex-col space-y-6 p-6">
         <div>
-          <h1>할일 목록</h1>
+          <h1>할 일</h1>
         </div>
 
         <TodoForm onAddTodo={addTodo} />
