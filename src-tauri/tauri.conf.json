@@ -14,8 +14,7 @@
       {
         "label": "main",
         "url": "/",
-        "visible": false,
-        "devtools": true
+        "visible": false
       },
       {
         "label": "splashscreen",
