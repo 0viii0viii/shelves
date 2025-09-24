@@ -19,8 +19,6 @@ import { useEffect, useState } from "react";
 import { type Todo, TodoService } from "@/services/todoService";
 
 import { CompletedTodosList } from "./components/CompletedTodosList";
-import { EmptyState } from "./components/EmptyState";
-import { LoadingState } from "./components/LoadingState";
 import { TodoForm } from "./components/TodoForm";
 import { TodoItem } from "./components/TodoItem";
 import { TODO_MESSAGES } from "./constants";
@@ -188,48 +186,39 @@ function RouteComponent() {
         <TodoForm onAddTodo={addTodo} />
 
         <div className="space-y-2 pb-4">
-          {loading ? (
-            <LoadingState />
-          ) : (
-            <>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={getIncompleteTodos(todos).map((todo) => todo.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {/* 미완료된 할 일들 */}
-                  {getIncompleteTodos(todos).map((todo) => (
-                    <TodoItem
-                      key={todo.id}
-                      todo={todo}
-                      isEditing={editingId === todo.id}
-                      editValue={editValue}
-                      onToggle={checkTodo}
-                      onDelete={deleteTodo}
-                      onStartEdit={startEdit}
-                      onSaveEdit={saveEdit}
-                      onCancelEdit={cancelEdit}
-                      onEditValueChange={setEditValue}
-                    />
-                  ))}
-                </SortableContext>
-
-                {/* 완료된 할 일들 */}
-                <CompletedTodosList
-                  todos={getCompletedTodos(todos)}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={getIncompleteTodos(todos).map((todo) => todo.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {/* 미완료된 할 일들 */}
+              {getIncompleteTodos(todos).map((todo) => (
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  isEditing={editingId === todo.id}
+                  editValue={editValue}
                   onToggle={checkTodo}
                   onDelete={deleteTodo}
+                  onStartEdit={startEdit}
+                  onSaveEdit={saveEdit}
+                  onCancelEdit={cancelEdit}
+                  onEditValueChange={setEditValue}
                 />
+              ))}
+            </SortableContext>
 
-                {/* 빈 상태 */}
-                {todos.length === 0 && <EmptyState />}
-              </DndContext>
-            </>
-          )}
+            {/* 완료된 할 일들 */}
+            <CompletedTodosList
+              todos={getCompletedTodos(todos)}
+              onToggle={checkTodo}
+              onDelete={deleteTodo}
+            />
+          </DndContext>
         </div>
       </div>
     </div>
