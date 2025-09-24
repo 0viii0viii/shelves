@@ -55,6 +55,13 @@ jobs:
         run: |
           choco install -y sqlite
 
+      - name: Install system dependencies (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          brew install sqlite
+          # macOS 빌드에 필요한 추가 도구들
+          brew install create-dmg
+
       - name: Install frontend dependencies
         run: pnpm install
 
@@ -63,7 +70,11 @@ jobs:
 
       - name: Build Tauri app (macOS)
         if: matrix.platform == 'macos-latest'
-        run: pnpm tauri build
+        run: |
+          # macOS 빌드 환경 설정
+          export MACOSX_DEPLOYMENT_TARGET=10.15
+          # 코드 서명 없이 빌드 (개발용)
+          pnpm tauri build --config '{"bundle":{"macOS":{"signingIdentity":null,"hardenedRuntime":false}}}'
 
       - name: Build Tauri app (Windows)
         if: matrix.platform == 'windows-latest'
@@ -74,7 +85,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: shelves-macos
-          path: src-tauri/target/release/bundle/
+          path: |
+            src-tauri/target/release/bundle/dmg/
+            src-tauri/target/release/bundle/macos/
 
       - name: Upload artifacts (Windows)
         if: matrix.platform == 'windows-latest'
