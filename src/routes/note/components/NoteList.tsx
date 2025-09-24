@@ -15,6 +15,13 @@ import {
 } from "@dnd-kit/sortable";
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Note, NoteService } from "@/services/noteService";
 
 import { NoteForm } from "./NoteForm";
@@ -27,6 +34,8 @@ interface NoteListProps {
 export function NoteList({ onOpenNote }: NoteListProps) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -73,17 +82,27 @@ export function NoteList({ onOpenNote }: NoteListProps) {
     }
   };
 
-  const handleDeleteNote = async (id: number) => {
-    if (!confirm("노트를 삭제하시겠습니까? 모든 메모가 함께 삭제됩니다.")) {
-      return;
-    }
+  const handleDeleteNote = (id: number) => {
+    setNoteToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteNote = async () => {
+    if (!noteToDelete) return;
 
     try {
-      await NoteService.deleteNote(id);
-      setNotes((prev) => prev.filter((note) => note.id !== id));
+      await NoteService.deleteNote(noteToDelete);
+      setNotes((prev) => prev.filter((note) => note.id !== noteToDelete));
+      setIsDeleteDialogOpen(false);
+      setNoteToDelete(null);
     } catch (error) {
       console.error("노트 삭제 실패:", error);
     }
+  };
+
+  const cancelDeleteNote = () => {
+    setIsDeleteDialogOpen(false);
+    setNoteToDelete(null);
   };
 
   const handleLockChange = async (
@@ -141,37 +160,53 @@ export function NoteList({ onOpenNote }: NoteListProps) {
     <>
       <NoteForm onAddNote={handleCreateNote} />
       <div className="space-y-2 pb-4">
-        {notes.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>아직 노트가 없습니다.</p>
-            <p className="text-sm">새 노트를 만들어보세요!</p>
-          </div>
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={notes.map((note) => note.id)}
+            strategy={verticalListSortingStrategy}
           >
-            <SortableContext
-              items={notes.map((note) => note.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-2">
-                {notes.map((note) => (
-                  <SortableNoteCard
-                    key={note.id}
-                    note={note}
-                    onUpdate={handleUpdateNote}
-                    onDelete={handleDeleteNote}
-                    onOpen={onOpenNote}
-                    onLockChange={handleLockChange}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        )}
+            <div className="space-y-2">
+              {notes.map((note) => (
+                <SortableNoteCard
+                  key={note.id}
+                  note={note}
+                  onUpdate={handleUpdateNote}
+                  onDelete={handleDeleteNote}
+                  onOpen={onOpenNote}
+                  onLockChange={handleLockChange}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       </div>
+
+      {/* 삭제 확인 Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>노트 삭제</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              정말로 이 노트를 삭제하시겠습니까? 모든 메모가 함께 삭제되며, 이
+              작업은 되돌릴 수 없습니다.
+            </p>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={cancelDeleteNote}>
+              취소
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteNote}>
+              삭제
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -38,6 +37,7 @@ export function PasswordDialog({
     setPassword("");
     onClose();
   };
+  console.log("title", title);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -47,9 +47,6 @@ export function PasswordDialog({
             <Lock className="h-5 w-5" />
             잠긴 노트
           </DialogTitle>
-          <DialogDescription>
-            {title} 노트를 열려면 비밀번호를 입력하세요.
-          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

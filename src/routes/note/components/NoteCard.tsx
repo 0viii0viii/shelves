@@ -2,7 +2,9 @@ import {
   Edit2,
   GripVertical,
   Lock,
+  MoreHorizontal,
   Save,
+  StickyNote,
   Trash2,
   Unlock,
   X,
@@ -11,6 +13,13 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Note } from "@/services/noteService";
 
@@ -79,7 +88,9 @@ export function NoteCard({
           </div>
 
           {/* 잠금 아이콘 */}
-          {note.isLocked && <Lock className="h-4 w-4 text-muted-foreground" />}
+          {note.isLocked ? (
+            <Lock className="h-4 w-4 text-muted-foreground" />
+          ) : null}
 
           {/* 제목 또는 편집 입력 */}
           {isEditing ? (
@@ -101,36 +112,40 @@ export function NoteCard({
           ) : (
             <>
               <span className="flex-1">{note.title}</span>
-              <div className="flex items-center space-x-1">
-                <Button variant="ghost" size="sm" onClick={() => onOpen(note)}>
-                  메모
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsEditing(true)}
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsLockDialogOpen(true)}
-                >
-                  {note.isLocked ? (
-                    <Unlock className="h-4 w-4" />
-                  ) : (
-                    <Lock className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onDelete(note.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onOpen(note)}>
+                    <StickyNote className="h-4 w-4 mr-2" />
+                    메모
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    편집
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setIsLockDialogOpen(true)}>
+                    {note.isLocked ? (
+                      <Unlock className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Lock className="h-4 w-4 mr-2" />
+                    )}
+                    {note.isLocked ? "잠금 해제" : "잠금 설정"}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => onDelete(note.id)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    삭제
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           )}
         </div>
@@ -140,8 +155,8 @@ export function NoteCard({
         isOpen={isLockDialogOpen}
         onClose={() => setIsLockDialogOpen(false)}
         onConfirm={handleLockChange}
-        noteTitle={note.title}
         currentIsLocked={!!note.isLocked}
+        currentPassword={note.password}
       />
     </Card>
   );

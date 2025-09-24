@@ -1,16 +1,10 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Edit2, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit2, GripVertical, Save, Trash2, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Memo } from "@/services/noteService";
 
 interface SortableMemoItemProps {
@@ -57,7 +51,7 @@ export function SortableMemoItem({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && e.ctrlKey) {
+    if (e.key === "Enter") {
       handleSave();
     } else if (e.key === "Escape") {
       handleCancel();
@@ -65,63 +59,50 @@ export function SortableMemoItem({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="p-3 border rounded-lg bg-card group"
-    >
+    <div ref={setNodeRef} style={style} className="p-2 border bg-card group">
       {isEditing ? (
-        <div className="space-y-2">
-          <Textarea
+        <div className="flex items-center space-x-2 flex-1">
+          <Input
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="min-h-[80px] resize-none"
+            className="flex-1"
             autoFocus
           />
-          <div className="flex gap-2">
-            <Button size="sm" onClick={handleSave}>
-              저장
-            </Button>
-            <Button size="sm" variant="outline" onClick={handleCancel}>
-              취소
-            </Button>
-          </div>
+          <Button variant="ghost" size="sm" onClick={handleSave}>
+            <Save className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleCancel}>
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       ) : (
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <p className="text-sm whitespace-pre-wrap">{memo.content}</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              {new Date(memo.createdAt).toLocaleString()}
-            </p>
+        <div className="flex items-center space-x-3">
+          {/* 드래그 핸들 */}
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
+          >
+            <GripVertical className="h-4 w-4 text-gray-400" />
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                <Edit2 className="h-4 w-4 mr-2" />
-                수정
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onDelete(memo.id)}
-                className="text-destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                삭제
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+
+          {/* 메모 내용 */}
+          <span className="flex-1">{memo.content}</span>
+
+          {/* 액션 버튼들 */}
+          <div className="flex items-center space-x-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditing(true)}
+            >
+              <Edit2 className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => onDelete(memo.id)}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       )}
     </div>
