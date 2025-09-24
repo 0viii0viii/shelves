@@ -110,7 +110,7 @@ jobs:
         env:
           CARGO_BUILD_JOBS: 4
           RUSTFLAGS: "-C target-cpu=native"
-        run: pnpm tauri build --debug
+        run: pnpm tauri build
 
       - name: Upload artifacts (macOS)
         if: matrix.platform == 'macos-latest'
