@@ -50,29 +50,6 @@ jobs:
           rustup target add x86_64-pc-windows-msvc
           rustup target add aarch64-apple-darwin
 
-      - name: Cache Rust dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            src-tauri/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-
-      - name: Cache Tauri CLI
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/tauri-cli
-            ~/.cache/tauri/
-          key: ${{ runner.os }}-tauri-cli-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-tauri-cli-
-
       - name: Install system dependencies (Windows)
         if: matrix.platform == 'windows-latest'
         run: |
@@ -96,9 +73,6 @@ jobs:
 
       - name: Build Tauri app (macOS)
         if: matrix.platform == 'macos-latest'
-        env:
-          CARGO_BUILD_JOBS: 4
-          RUSTFLAGS: "-C target-cpu=native"
         run: |
           # macOS 빌드 환경 설정
           export MACOSX_DEPLOYMENT_TARGET=10.15
