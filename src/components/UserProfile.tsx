@@ -1,7 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, Settings } from "lucide-react";
+import { useState } from "react";
 
 import { useSupabaseAuth } from "@/auth/supabase";
+import { SettingsModal } from "@/components/SettingsModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -13,6 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function UserProfile() {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -31,37 +35,46 @@ export function UserProfile() {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="hover:bg-accent flex w-full cursor-pointer items-center gap-3 transition-colors">
-          <Avatar className="h-8 w-8">
-            <AvatarImage
-              src={user?.user_metadata?.avatar_url || ""}
-              alt={user?.user_metadata?.full_name || ""}
-            />
-            <AvatarFallback>
-              {getInitials(user?.user_metadata?.full_name || "")}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate text-sm font-medium">
-              {user?.user_metadata?.full_name || ""}
-            </span>
-            <span className="text-muted-foreground truncate text-xs">
-              {user?.email || ""}
-            </span>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="hover:bg-accent flex w-full cursor-pointer items-center gap-3 transition-colors">
+            <Avatar className="h-8 w-8">
+              <AvatarImage
+                src={user?.user_metadata?.avatar_url || ""}
+                alt={user?.user_metadata?.full_name || ""}
+              />
+              <AvatarFallback>
+                {getInitials(user?.user_metadata?.full_name || "")}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-sm font-medium">
+                {user?.user_metadata?.full_name || ""}
+              </span>
+              <span className="text-muted-foreground truncate text-xs">
+                {user?.email || ""}
+              </span>
+            </div>
+            <ChevronDown className="text-muted-foreground h-4 w-4" />
           </div>
-          <ChevronDown className="text-muted-foreground h-4 w-4" />
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48" align="start">
-        <DropdownMenuLabel>내 계정</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>로그아웃</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-48" align="start">
+          <DropdownMenuLabel>내 계정</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>설정</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>로그아웃</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
+    </>
   );
 }

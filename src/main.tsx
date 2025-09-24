@@ -6,6 +6,7 @@ import ReactDOM from "react-dom/client";
 
 import { SupabaseAuthProvider, useSupabaseAuth } from "./auth/supabase";
 import { LoadingScreen } from "./components/LoadingSpinner";
+import { ThemeProvider } from "./contexts/ThemeContext";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 
@@ -33,9 +34,11 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <SupabaseAuthProvider>
-        <App />
-      </SupabaseAuthProvider>
+      <ThemeProvider>
+        <SupabaseAuthProvider>
+          <App />
+        </SupabaseAuthProvider>
+      </ThemeProvider>
     </StrictMode>,
   );
 }
