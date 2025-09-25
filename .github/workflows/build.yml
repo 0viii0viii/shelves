@@ -17,6 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node.js & pnpm 세팅
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -32,7 +33,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: Setup pnpm cache
+      - name: Cache pnpm store
         uses: actions/cache@v4
         with:
           path: ${{ env.STORE_PATH }}
@@ -40,10 +41,31 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      # 선택: node_modules 캐싱 (pnpm install 더 빠르게)
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Rust 설치 & 캐싱
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rust-src
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src-tauri/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: Install Rust targets
         run: |
@@ -59,30 +81,38 @@ jobs:
         if: matrix.platform == 'macos-latest'
         run: |
           brew install sqlite
-          # macOS 빌드에 필요한 추가 도구들
           brew install create-dmg
 
+      # 프론트엔드 빌드
       - name: Install frontend dependencies
         run: pnpm install
 
       - name: Build frontend
         run: pnpm build
+
+      # macOS 빌드 (ad-hoc 서명 포함)
+      - name: Build Tauri app (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          export MACOSX_DEPLOYMENT_TARGET=10.15
+          pnpm tauri build --config '{"bundle":{"macOS":{"signingIdentity":"-","hardenedRuntime":false}}}'
+
+          # zip 아카이브 생성 시 권한 유지 (손상된 파일 방지)
+          cd src-tauri/target/release/bundle/macos
+          ditto -c -k --sequesterRsrc --keepParent *.app ../../shelves-macos.zip
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-      - name: Build Tauri app (macOS)
-        if: matrix.platform == 'macos-latest'
-        run: |
-          # macOS 빌드 환경 설정
-          export MACOSX_DEPLOYMENT_TARGET=10.15
-          # 코드 서명 없이 빌드 (개발용)
-          pnpm tauri build --config '{"bundle":{"macOS":{"signingIdentity":"-","hardenedRuntime":false}}}'
-
+      # Windows 빌드
       - name: Build Tauri app (Windows)
         if: matrix.platform == 'windows-latest'
         run: pnpm tauri build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
+      # 아티팩트 업로드 (macOS)
       - name: Upload artifacts (macOS)
         if: matrix.platform == 'macos-latest'
         uses: actions/upload-artifact@v4
@@ -90,8 +120,9 @@ jobs:
           name: shelves-macos
           path: |
             src-tauri/target/release/bundle/dmg/
-            src-tauri/target/release/bundle/macos/
+            src-tauri/target/release/shelves-macos.zip
 
+      # 아티팩트 업로드 (Windows)
       - name: Upload artifacts (Windows)
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
