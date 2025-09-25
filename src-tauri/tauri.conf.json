@@ -32,9 +32,6 @@
     }
   },
   "bundle": {
-    "macOs": {
-      "signingIdentity": "-"
-    },
     "active": true,
     "targets": "all",
     "icon": [
