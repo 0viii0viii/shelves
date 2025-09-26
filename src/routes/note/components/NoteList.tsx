@@ -33,7 +33,6 @@ interface NoteListProps {
 
 export function NoteList({ onOpenNote }: NoteListProps) {
   const [notes, setNotes] = useState<Note[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
 
@@ -46,13 +45,10 @@ export function NoteList({ onOpenNote }: NoteListProps) {
 
   const loadNotes = async () => {
     try {
-      setIsLoading(true);
       const notesData = await NoteService.getAllNotes();
       setNotes(notesData);
     } catch (error) {
       console.error("노트 로딩 실패:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -143,18 +139,6 @@ export function NoteList({ onOpenNote }: NoteListProps) {
       }
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="border rounded-lg p-2 bg-card animate-pulse">
-            <div className="h-4 bg-muted rounded"></div>
-          </div>
-        ))}
-      </div>
-    );
-  }
 
   return (
     <>
