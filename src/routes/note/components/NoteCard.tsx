@@ -117,9 +117,10 @@ export function NoteCard({
           ) : (
             <>
               <span
-                className="flex-1 cursor-pointer"
+                className="flex-1 truncate cursor-pointer"
                 role="button"
                 onClick={openMemos}
+                title={note.title}
               >
                 {note.title}
               </span>

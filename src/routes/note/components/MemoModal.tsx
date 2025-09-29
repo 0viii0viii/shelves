@@ -162,11 +162,11 @@ export function MemoModal({ note, isOpen, onClose }: MemoModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 min-w-0">
             {note.isLocked ? (
-              <Lock className="h-4 w-4 text-muted-foreground" />
+              <Lock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             ) : null}
-            {note.title}
+            <span className="truncate">{note.title}</span>
           </DialogTitle>
         </DialogHeader>
 

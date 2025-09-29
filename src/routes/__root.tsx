@@ -15,7 +15,7 @@ function BaseLayout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen flex-col">
       <SidebarProvider>
         <AppSidebar />
-        <main className="bg-background h-full w-full">{children}</main>
+        <main className="bg-background h-full w-full min-w-0">{children}</main>
       </SidebarProvider>
     </div>
   );

@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Trash2 } from "lucide-react";
+import { ChevronsUpDown, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Todo } from "@/services/todoService";
 
 interface CompletedTodosListProps {
@@ -48,17 +54,25 @@ export const CompletedTodosList = ({
                   checked={!!todo.completed}
                   onCheckedChange={() => onToggle(todo.id)}
                 />
-                <span className="text-muted-foreground line-through">
+                <span className="text-muted-foreground line-through flex-1 truncate">
                   {todo.content}
                 </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="ml-auto"
-                  onClick={() => onDelete(todo.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => onDelete(todo.id)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      삭제
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </CardContent>
           </Card>

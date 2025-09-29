@@ -1,9 +1,22 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Edit2, GripVertical, Save, Trash2, X } from "lucide-react";
+import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
+import {
+  Edit2,
+  GripVertical,
+  MoreHorizontal,
+  Save,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Memo } from "@/services/noteService";
 
@@ -88,21 +101,30 @@ export function SortableMemoItem({
           </div>
 
           {/* 메모 내용 */}
-          <span className="flex-1">{memo.content}</span>
+          <span className="flex-1 truncate" title={memo.content}>
+            {memo.content}
+          </span>
 
-          {/* 액션 버튼들 */}
-          <div className="flex items-center space-x-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-            >
-              <Edit2 className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => onDelete(memo.id)}>
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                <Edit2 className="h-4 w-4" />
+                편집
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onDelete(memo.id)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+                삭제
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
     </div>

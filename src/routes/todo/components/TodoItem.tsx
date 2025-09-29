@@ -1,10 +1,24 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Edit2, GripVertical, Save, Trash2, X } from "lucide-react";
+import {
+  Edit2,
+  GripVertical,
+  MoreHorizontal,
+  Save,
+  Trash2,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import type { Todo } from "@/services/todoService";
 
@@ -99,23 +113,32 @@ export const TodoItem = ({
             </div>
           ) : (
             <>
-              <span className="flex-1">{todo.content}</span>
-              <div className="flex items-center space-x-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onStartEdit(todo.id, todo.content)}
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onDelete(todo.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              <span className="flex-1 truncate" title={todo.content}>
+                {todo.content}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => onStartEdit(todo.id, todo.content)}
+                  >
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    편집
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => onDelete(todo.id)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    삭제
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           )}
         </div>
